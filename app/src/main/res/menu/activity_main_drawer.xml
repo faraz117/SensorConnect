@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_sensors"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Sensors" />
+        <item
+            android:id="@+id/nav_controller"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Controller" />
+        <item
+            android:id="@+id/nav_medium"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Medium" />
+        <item
+            android:id="@+id/nav_protocol"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Protocol" />
+        <item
+            android:id="@+id/nav_intelligence"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Intelligence" />
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Share" />
+            <item
+                android:id="@+id/nav_support"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Contact Support" />
+        </menu>
+    </item>
+
+</menu>
