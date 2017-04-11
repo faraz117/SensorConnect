@@ -11,7 +11,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.List;
 
 
 /**
@@ -25,8 +30,7 @@ public class SensorFragment extends Fragment {
 
     private  SensorManager mSensorManager;
     private Sensor mAccelerometer;
-    private TextView accXTv, accYTv, accZTv;
-    private float accX,accY,accZ;
+    private List<Sensor> deviceSensors;
 
     public SensorFragment() {
         // Required empty public constructor
@@ -37,12 +41,7 @@ public class SensorFragment extends Fragment {
         @Override
         public void onSensorChanged(SensorEvent arg0) {
             // TODO Auto-generated method stub
-            accX=arg0.values[0];
-            accY=arg0.values[1];
-            accZ=arg0.values[2];
-            accXTv.setText(Float.toString(accX));
-            accYTv.setText(Float.toString(accY));
-            accZTv.setText(Float.toString(accZ));
+
         }
 
         @Override
@@ -57,6 +56,7 @@ public class SensorFragment extends Fragment {
         //
         super.onCreate(savedInstanceState);
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        deviceSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(mSensorListener,mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
@@ -65,20 +65,37 @@ public class SensorFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        /* To load sensors dynamically
-        RadioGroup group = (RadioGroup) findViewById(R.id.radio_group_sensor);
-        RadioButton button;
-        for(int i = 0; i < 3; i++) {
-            button = new RadioButton(this);
-            button.setText("Button " + i);
-            group.addView(button);
-        } */
         View v = inflater.inflate(R.layout.fragment_sensor, container, false);
-        accXTv = (TextView) v.findViewById(R.id.accXValue);
-        accYTv = (TextView) v.findViewById(R.id.accYValue);
-        accZTv = (TextView) v.findViewById(R.id.accZValue);
         return v;
+    }
+
+    public void onViewCreated(View view, Bundle savedInstanceState){
+        super.onViewCreated(view, savedInstanceState);
+
+        // TODO list the information here
+        // get the listview from our layout
+        ListView listView = (ListView)view.findViewById(R.id.list_sensors);
+
+        // and populate it with the most basic view available for listviews, a single text view
+        // only made final so we can refer to it in our anonymuous innerclass for clickListener impl
+        final ArrayAdapter<Sensor> listAdapter = new ArrayAdapter<>(getActivity(),
+                android.R.layout.simple_list_item_1, android.R.id.text1, deviceSensors.toArray(new Sensor[deviceSensors.size()]));
+        // set it to our listview
+        listView.setAdapter(listAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Sensor sensor = listAdapter.getItem(i);
+                // Or run sensor on click
+                Toast.makeText(getActivity(), sensor.getName(),
+                        Toast.LENGTH_LONG).show();
+                // and pass it on to the data fragment in a bundle
+                Bundle bundle = new Bundle();
+                //bundle.putInt(SensorFragment.KEY_SENSOR_TYPE, sensor.getType());
+                //getParentActivity().switchFragment(SensorFragment.getInstance(bundle));
+
+            }
+        });
     }
 
 
