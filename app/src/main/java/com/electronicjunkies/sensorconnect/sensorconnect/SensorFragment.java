@@ -8,6 +8,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,8 @@ public class SensorFragment extends Fragment {
         // Required empty public constructor
 
     }
+
+
     private final SensorEventListener mSensorListener = new SensorEventListener() {
 
         @Override
@@ -57,7 +60,6 @@ public class SensorFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         deviceSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(mSensorListener,mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
@@ -74,13 +76,15 @@ public class SensorFragment extends Fragment {
 
         // TODO list the information here
         // get the listview from our layout
-        ListView listView = (ListView)view.findViewById(R.id.list_sensors);
 
+        final ListView listView = (ListView)view.findViewById(R.id.list_sensors);
+        final SparseBooleanArray mSelectedItemsIds = new SparseBooleanArray();
         // and populate it with the most basic view available for listviews, a single text view
         // only made final so we can refer to it in our anonymuous innerclass for clickListener impl
         final ArrayAdapter<Sensor> listAdapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, deviceSensors.toArray(new Sensor[deviceSensors.size()]));
+                android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, deviceSensors.toArray(new Sensor[deviceSensors.size()]));
         // set it to our listview
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -88,16 +92,21 @@ public class SensorFragment extends Fragment {
                 Sensor sensor = listAdapter.getItem(i);
                 // Or run sensor on click
                 Toast.makeText(getActivity(), sensor.getName(),
-                        Toast.LENGTH_LONG).show();
-                // and pass it on to the data fragment in a bundle
-                Bundle bundle = new Bundle();
-                //bundle.putInt(SensorFragment.KEY_SENSOR_TYPE, sensor.getType());
-                //getParentActivity().switchFragment(SensorFragment.getInstance(bundle));
+                Toast.LENGTH_SHORT).show();
+                if(!mSelectedItemsIds.get(i)){
+                    listView.setItemChecked(i, true);
+                    mSelectedItemsIds.put(i, true);
+                    // Start the sensor and Display Sensor Values
+                    // Store SelectedIds to pass to the final fragment
+                }
+                else{
+                    mSelectedItemsIds.delete(i);
+                    listView.setItemChecked(i, false);
+                }
 
             }
         });
+
+
     }
-
-
-
 }
